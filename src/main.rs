@@ -1,5 +1,5 @@
+#[macro_use] mod common;
 mod day1;
-mod common;
 
 // dummy file to fool intellij-rust into thinking the separate files are part of the module
 fn main() {
