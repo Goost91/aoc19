@@ -3,21 +3,23 @@ use std::fs::File;
 use std::fs;
 use std::io;
 use std::time::Instant;
+use std::convert::TryInto;
 
-pub fn part1() -> usize {
-    let mut data: Vec<usize> = split_reader!(2, ",")
-        .map(|w| w.parse::<usize>().unwrap())
+pub fn part1() -> u128 {
+    let mut data: Vec<u128> = split_reader!(2, ",")
+        .map(|w| w.parse::<u128>().unwrap())
         .collect();
 
     run(&mut data, 12, 2)
 }
 
-pub fn part2() -> usize {
-    let data: Vec<usize> = split_reader!(2, ",")
-        .map(|w| w.parse::<usize>().unwrap())
+pub fn part2() -> u128 {
+    let start = Instant::now();
+    let data: Vec<u128> = split_reader!(2, ",")
+        .map(|w| w.parse::<u128>().unwrap())
         .collect();
 
-    let mut result = 0usize;
+    let mut result = 0u128;
 
     for x in 0..=99 {
         for y in 0..=99 {
@@ -27,10 +29,11 @@ pub fn part2() -> usize {
         }
     }
 
+    println!("Time taken: {:?}", (Instant::now() - start));
     result
 }
 
-fn run(mut data: &mut Vec<usize>, noun: usize, verb: usize) -> usize {
+fn run(mut data: &mut Vec<u128>, noun: u128, verb: u128) -> u128 {
     let mut ip = 0;
 
     data[1] = noun;
@@ -38,7 +41,7 @@ fn run(mut data: &mut Vec<usize>, noun: usize, verb: usize) -> usize {
 
     while data[ip] != 99 {
         let result = process_opcode(data[ip], data[ip + 1], data[ip + 2], &data);
-        let dp = data[ip + 3];
+        let dp : usize = data[ip + 3] as usize;
         data[dp] = result;
 
         ip += 4;
@@ -48,10 +51,10 @@ fn run(mut data: &mut Vec<usize>, noun: usize, verb: usize) -> usize {
 }
 
 
-pub fn process_opcode(opcode: usize, f: usize, s:usize, data: &Vec<usize>) -> usize {
+pub fn process_opcode(opcode: u128, f: u128, s:u128, data: &Vec<u128>) -> u128 {
     match opcode {
-        1 => data[f] + data[s],
-        2 => data[f] * data[s],
+        1 => data[f as usize] + data[s as usize],
+        2 => data[f as usize] * data[s as usize],
         _ => unreachable!()
     }
 }
