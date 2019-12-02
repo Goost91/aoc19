@@ -14,7 +14,7 @@ pub fn part2() -> f64 {
 pub fn run<F>(calculate: F) -> f64
     where
         F: Fn(f64) -> f64 {
-    input_reader!(1)
+    line_reader!(1)
         .map(|line| line.parse::<f64>().unwrap())
         .map(calculate)
         .sum()
