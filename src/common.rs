@@ -13,6 +13,16 @@ macro_rules! line_reader {
 }
 
 #[macro_export]
+macro_rules! parsed_line_reader {
+    ($x:expr, $y:ty) => {
+    BufReader::new(File::open(format!("input/day{}", $x)).unwrap())
+        .lines()
+        .map(Result::unwrap)
+        .map(|line| line.parse::<$y>().unwrap())
+    }
+}
+
+#[macro_export]
 macro_rules! split_reader {
     ($x:expr, $y:expr) => {
         fs::read_to_string(format!("input/day{}", $x)).unwrap().split($y)

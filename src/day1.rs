@@ -3,34 +3,37 @@ use std::fs::File;
 use std::io;
 use crate::common::read_input;
 
-pub fn part1() -> f64 {
+pub fn part1() -> i64 {
     run(fuel_required)
 }
 
-pub fn part2() -> f64 {
-    run(|v| all_fuel_required(v, 0f64))
+pub fn part2() -> i64 {
+    run(all_fuel_required)
 }
 
-pub fn run<F>(calculate: F) -> f64
+fn run<F>(calculate: F) -> i64
     where
-        F: Fn(f64) -> f64 {
-    line_reader!(1)
-        .map(|line| line.parse::<f64>().unwrap())
+        F: Fn(i64) -> i64 {
+    parsed_line_reader!(1, i64)
         .map(calculate)
         .sum()
 }
 
-fn fuel_required(weight: f64) -> f64 {
-    ((weight / 3f64).floor() - 2f64)
+fn fuel_required(mass: i64) -> i64 {
+    ((mass as f64 / 3.0).floor() - 2.0) as i64
 }
 
-pub fn all_fuel_required(mass: f64, total: f64) -> f64 {
-    match mass {
-        m if m <= 0f64 => total,
-        m => {
-            let req = fuel_required(m);
+fn all_fuel_required(mass: i64) -> i64 {
+    fn iter(mass: i64, total: i64) -> i64 {
+        match mass {
+            m if m <= 0 => total,
+            m => {
+                let req = fuel_required(m);
 
-            all_fuel_required(req, total + req.max(0f64))
+                iter(req, total + req.max(0))
+            }
         }
     }
+
+    iter(mass, 0)
 }
