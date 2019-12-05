@@ -107,14 +107,14 @@ fn steps_until(input: Vec<Instruction>, point: Point) -> i32 {
     let mut curr_point = Point::from((0, 0));
     let mut steps = 0;
 
-    for p in 0..input.len() {
+    'outer: for p in 0..input.len() {
         for i in 0..input[p].1 {
-            if curr_point == point {
-                break;
-            }
-
             curr_point = add_point(curr_point, &input[p]);
             steps += 1;
+
+            if curr_point == point {
+                break 'outer;
+            }
         }
     }
 
