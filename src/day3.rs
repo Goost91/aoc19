@@ -12,11 +12,10 @@ enum Direction {
     Down,
 }
 
-pub type Instruction = (Direction, i64);
+type Instruction = (Direction, i64);
 pub type Point = (i64, i64);
 
 pub fn part1() -> i64 {
-    let start = Instant::now();
     let input = line_reader!(3).collect::<Vec<String>>();
 
     let first_wire = process_wire(input[0].split(",")
@@ -28,8 +27,6 @@ pub fn part1() -> i64 {
 
     let mut collisions = first_wire.iter().filter(|t| second_wire.contains(t)).map(manhattan_distance).collect::<Vec<i64>>();
     collisions.sort_unstable();
-
-    println!("That took {:?}", (Instant::now() - start));
     collisions[0]
 }
 
@@ -38,7 +35,6 @@ fn manhattan_distance(point: &Point) -> i64 {
 }
 
 pub fn part2() -> i32 {
-    let start = Instant::now();
     let input = line_reader!(3).collect::<Vec<String>>();
 
     let first_insns = input[0].split(",")
@@ -60,9 +56,6 @@ pub fn part2() -> i32 {
     }
 
     collision_steps.sort_unstable();
-
-    println!("That took {:?}", (Instant::now() - start));
-
     collision_steps[0]
 }
 

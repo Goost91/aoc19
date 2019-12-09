@@ -36,3 +36,18 @@ pub fn read_input(day: u8) -> BufReader<File> {
     BufReader::new(File::open(format!("input/day{}", day)).unwrap())
 }
 
+pub fn to_digits(input: &u32) -> Vec<u32> {
+    input
+        .to_string()
+        .chars()
+        .map(|d| d.to_digit(10).unwrap())
+        .collect::<Vec<_>>()
+}
+
+#[macro_export]
+macro_rules! time_since {
+    ($y:expr) => {
+
+    println!("Time since start: {} sec", (Instant::now() - $y).as_micros() as f64 / 1_000_000.0);
+    }
+}

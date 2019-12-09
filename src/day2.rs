@@ -4,18 +4,23 @@ use std::fs;
 use std::io;
 use std::time::Instant;
 use std::convert::TryInto;
+use crate::intcode;
+use crate::intcode::{State, Word};
 
-pub fn part1() -> u128 {
-    let mut data: Vec<u128> = split_reader!(2, ",")
-        .map(|w| w.parse::<u128>().unwrap())
+pub fn part1() -> Word {
+    let start = Instant::now();
+    let mut data: Vec<Word> = split_reader!(2, ",")
+        .map(|w| w.parse::<Word>().unwrap())
         .collect();
 
-    run(&mut data, 12, 2)
+    run(&mut data, 12, 2);
+    time_since!(start);
+    0
 }
 
 pub fn part2() -> usize {
-    let data: Vec<u128> = split_reader!(2, ",")
-        .map(|w| w.parse::<u128>().unwrap())
+    let data: Vec<Word> = split_reader!(2, ",")
+        .map(|w| w.parse::<Word>().unwrap())
         .collect();
 
     let mut result = 0usize;
@@ -31,28 +36,15 @@ pub fn part2() -> usize {
     result
 }
 
-fn run(mut data: &mut Vec<u128>, noun: u128, verb: u128) -> u128 {
-    let mut ip = 0;
-
+fn run(mut data: &mut Vec<Word>, noun: Word, verb: Word) -> Word {
     data[1] = noun;
     data[2] = verb;
+    
+    let mut state = State { mem: &mut data.to_vec(), input: &mut vec![], ip: 0, current_opcode: 0 };
 
-    while data[ip] != 99 {
-        let result = process_opcode(data[ip], data[ip + 1], data[ip + 2], &data);
-        let dp: usize = data[ip + 3] as usize;
-        data[dp] = result;
+    intcode::run(&mut state);
 
-        ip += 4;
-    }
-
-    data[0]
+    state.mem[0]
 }
 
 
-fn process_opcode(opcode: u128, f: u128, s: u128, data: &Vec<u128>) -> u128 {
-    match opcode {
-        1 => data[f as usize] + data[s as usize],
-        2 => data[f as usize] * data[s as usize],
-        _ => unreachable!()
-    }
-}
