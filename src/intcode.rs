@@ -9,7 +9,7 @@ pub struct State<'a> {
     pub mem: &'a mut Vec<Word>,
     pub input: &'a mut Vec<Word>,
     pub ip: usize,
-    pub current_opcode: Word,
+    pub current_opcode: u16,
 }
 
 impl State<'_> {
@@ -17,7 +17,7 @@ impl State<'_> {
         self.mem[addr] = value
     }
 
-    fn set_opcode(&mut self, opcode: Word) {
+    fn set_opcode(&mut self, opcode: u16) {
         self.current_opcode = opcode;
     }
 
@@ -26,7 +26,7 @@ impl State<'_> {
     }
 }
 
-pub fn opcode_length(opcode: &Word) -> Word {
+pub fn opcode_length(opcode: &u16) -> Word {
     match opcode % 100 {
         1 | 2 | 7 | 8 => 4,
         5 | 6 => 3,
@@ -36,13 +36,13 @@ pub fn opcode_length(opcode: &Word) -> Word {
 }
 
 pub fn run(state: &mut State) {
-    while state.mem[state.ip] != 99 {
-        state.set_opcode(state.mem[state.ip]);
-        let opcode_len = opcode_length(&state.mem[state.ip]) as usize;
-        let params = get_params(opcode_len, state);
-        let result = process_opcode(state, params);
+    state.set_opcode(state.mem[state.ip] as u16);
+    while state.current_opcode != 99 {
+        let opcode_len = opcode_length(&state.current_opcode) as usize;
+        let result = process_opcode(state);
 
         state.ip += opcode_len;
+        state.set_opcode(state.mem[state.ip] as u16);
     }
 }
 
@@ -59,35 +59,21 @@ pub fn read_value(state: &State, offset: usize) -> Word {
     }
 }
 
-pub fn get_params(input_length: usize, state: &mut State) -> Vec<Word> {
-    let mut results = vec![];
-    let do_write = is_write_op(state.mem[state.ip]);
-
-    if do_write {
-        for i in 1..input_length - 1 {
-            results.push(read_value(state, i));
-        }
-
-        results.push(state.mem[state.ip + input_length-1]);
-    } else {
-        for i in 1..input_length {
-            results.push(read_value(state, i));
-        }
-    }
-
-    results
+pub fn read_imm(state: &State, offset: usize) -> usize {
+    state.mem[state.ip + offset as usize] as usize
 }
 
-pub fn process_opcode(state: &mut State, params: Vec<Word>) {
-    match state.mem[state.ip] % 100 {
-        1 => state.set_mem(params[2] as usize, params[0] + params[1]),
-        2 => state.set_mem(params[2] as usize, params[0] * params[1]),
-        3 => state.set_mem(params[0] as usize, state.input.clone().pop().unwrap()),
-        4 => println!("Value is {}", params[0]),
-        5 => if params[0] != 0 { state.set_ip((params[1] - 3) as usize) },
-        6 => if params[0] == 0 { state.set_ip((params[1] - 3) as usize) },
-        7 => state.set_mem(params[2] as usize, if params[0] < params[1] { 1 } else { 0 }),
-        8 => state.set_mem(params[2] as usize, if params[0] == params[1] { 1 } else { 0 }),
+pub fn process_opcode(state: &mut State) {
+    match state.current_opcode % 100 {
+        1 => state.set_mem(read_imm(state, 3), read_value(state, 1) + read_value(state, 2)),
+        2 => state.set_mem(read_imm(state, 3), read_value(state, 1) * read_value(state, 2)),
+
+        3 => state.set_mem(read_imm(state, 1), state.input.clone().pop().unwrap()),
+        4 => println!("Value is {}", read_value(state, 1)),
+        5 => if read_value(state, 1) != 0 { state.set_ip((read_value(state, 2) - 3) as usize) },
+        6 => if read_value(state, 1) == 0 { state.set_ip((read_value(state, 2) - 3) as usize) },
+        7 => state.set_mem(read_imm(state, 3), if read_value(state, 1) < read_value(state, 2) { 1 } else { 0 }),
+        8 => state.set_mem(read_imm(state, 3), if read_value(state, 1) == read_value(state, 2) { 1 } else { 0 }),
 
         x => unreachable!("opcode {} doesn't exist\r\n State: {:?}", x, state)
     }
