@@ -9,24 +9,15 @@ use std::collections::HashMap;
 use crate::node::*;
 
 pub fn part1() -> usize {
-    let mut map: HashMap<String, Vec<String>> = HashMap::new();
     let mut tree = ArenaTree::default();
-
     read_input(&mut tree);
-    let mut result = 0;
-
-    for x in tree.arena.to_vec() {
-        result += tree.depth(x.idx)
-    }
-
-    result
+    tree.arena.to_vec().into_iter().fold(0, |acc, node| acc + tree.depth(node.idx))
 }
 
 pub fn part2() -> usize {
     let mut tree = ArenaTree::default();
-
     read_input(&mut tree);
-    find_path(&mut tree)
+    tree.distance_between("YOU".into(), "SAN".into())
 }
 
 pub fn read_input(tree: &mut ArenaTree<String>) {
@@ -37,8 +28,4 @@ pub fn read_input(tree: &mut ArenaTree<String>) {
         tree.arena[parent].children.push(child);
         tree.arena[child].parent = Some(parent);
     }
-}
-
-pub fn find_path(tree: &mut ArenaTree<String>) -> usize {
-    tree.distance_between("YOU".into(), "SAN".into())
 }
