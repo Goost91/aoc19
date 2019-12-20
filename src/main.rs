@@ -5,8 +5,8 @@
 
 use std::thread;
 use std::time::*;
-
-extern crate rayon;
+extern crate petgraph;
+extern crate lazy_static;
 
 #[macro_use] mod common;
 mod day1;
@@ -14,7 +14,9 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 mod intcode;
+mod node;
 
 // dummy file to fool intellij-rust into thinking the separate files are part of the module
 fn main() {/*
@@ -25,8 +27,10 @@ fn main() {/*
     println!("Result of day2.2: {}", day3::part2());
 
     println!("Result of day4.1: {}", day4::part1());
-    println!("Result of day4.2: {}", day4::part2());*/
+    println!("Result of day4.2: {}", day4::part2());
 
     println!("Result of day5.1: {}", day5::part1());
-    println!("Result of day5.2: {}", day5::part2());
+    println!("Result of day5.2: {}", day5::part2());*/
+    println!("Result of day5.1: {}", day6::part1());
+    println!("Result of day5.2: {}", day6::part2());
 }
